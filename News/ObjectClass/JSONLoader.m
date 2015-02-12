@@ -9,7 +9,18 @@
 #import "JSONLoader.h"
 #import "News.h"
 @implementation JSONLoader
+static JSONLoader *sharedInstance = nil;    // static instance variable
 
+//Shared Instance
++ (JSONLoader *)sharedCenter {
+    if (sharedInstance == nil) {
+        sharedInstance = [[super allocWithZone:NULL] init];
+    }
+    return sharedInstance;
+}
+
+
+//extracting data and creating an array
 - (NSMutableArray *)rowsFromJSONData:(NSString *)data {
     
     NSError *jsonError;
@@ -20,9 +31,8 @@
     
     
     // Create a new array to hold the rows
-    NSMutableArray *locations=nil;
-    [locations autorelease];
-    locations = [[NSMutableArray alloc] init];
+    NSMutableArray *arrayData=nil;
+    arrayData = [[NSMutableArray alloc] init];
     // Get an array of dictionaries with the key "rows"
     NSArray *array = [jsonDictionary objectForKey:@"rows"];
     // Iterate through the array of dictionaries
@@ -33,12 +43,16 @@
             [news autorelease];
             news=[[News alloc] initWithJSONDictionary:dict];
             // Add the Location object to the array
-            [locations addObject:news];
+            [arrayData addObject:news];
         }
     }
 
     // Return the array of Location objects
-    return locations;
+    return arrayData;
+}
+
+-(void)dealloc {
+    [super dealloc];
 }
 
 

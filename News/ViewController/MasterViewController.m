@@ -17,7 +17,7 @@
 
 @interface MasterViewController ()
 {
-    NSMutableArray *_locations;
+    NSMutableArray *titlesArray;
 
 }
 @property(nonatomic,retain)IBOutlet UIActivityIndicatorView *activityIndicator;
@@ -37,27 +37,35 @@
 #pragma UserDefined Methods
 //Referesh the data
 -(void)refreshData:(id)sender{
-    JSONLoader *jsonLoader = [[JSONLoader alloc] init];
-    if (self.activityIndicator==nil) {
-        [self.view addSubview:self.activityIndicator];
-    }
+    JSONLoader *jsonLoader = [JSONLoader sharedCenter];
     
+    //Remove all array data if exist
+    [titlesArray removeAllObjects];
+    titlesArray=nil;
+    [self.tableView reloadData];
+    //Adding Activity indicator
+    [self.activityIndicator setHidden:NO];
     [self.activityIndicator startAnimating];
+    
+    //Request the service using url
     NSURL *URL = [NSURL URLWithString:[ServiceURL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
     NSURLRequest *requestURL = [[NSURLRequest alloc] initWithURL:URL];
     [NSURLConnection sendAsynchronousRequest:requestURL
                                        queue:[NSOperationQueue mainQueue]
                            completionHandler:^(NSURLResponse *response, NSData *data, NSError *error)
      {
+         //stop animating activity indicator
          [self.activityIndicator stopAnimating];
-         [self.activityIndicator removeFromSuperview];
+         [self.activityIndicator setHidden:YES];
          
-         NSString *jsonString =[[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding];
+         //If data is null alert will be displayed
          if (data==NULL) {
              UIAlertView *alert =[[[UIAlertView alloc]initWithTitle:@"Alert!" message:@"Sorry for inconvinience" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil] autorelease];
              [alert show];
          }
-         _locations = [jsonLoader rowsFromJSONData:jsonString];
+         //parsing the data to jsonloader and save to array
+         NSString *jsonString =[[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding];
+         titlesArray = [jsonLoader rowsFromJSONData:jsonString];
          
          // Now that we have the data, reload the table data on the main UI thread
          [self.tableView performSelectorOnMainThread:@selector(reloadData) withObject:nil waitUntilDone:YES];
@@ -76,7 +84,7 @@
 - (void)prepareForSegue:(UIStoryboardSegue *)segue sender:(id)sender {
     if ([[segue identifier] isEqualToString:@"showDetail"]) {
         NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
-        News *newsObject =[_locations objectAtIndex:indexPath.row];
+        News *newsObject =[titlesArray objectAtIndex:indexPath.row];
         [[segue destinationViewController] setDetailItem:newsObject];
     }
 }
@@ -84,7 +92,8 @@
 #pragma mark - Table View
 #pragma mark - Table View Controller Methods
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
-    return [_locations count];
+    //count of the array
+    return [titlesArray count];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
@@ -92,15 +101,12 @@
     
     CustomNewsTableViewCell *cell = (CustomNewsTableViewCell*)[tableView dequeueReusableCellWithIdentifier:cellIdentifier];
     
-    //NSDate *object = _objects[indexPath.row];
-    
     if(cell == nil)
     {
         cell = [[[CustomNewsTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier]autorelease];
-        // expected identifier
     }
-    
-    News *news = [_locations objectAtIndex:indexPath.row];
+    //Type caste the array and populate the value
+    News *news = [titlesArray objectAtIndex:indexPath.row];
     
     cell.titleLbl.text = news.title;
     if ([news.descripn isEqual:[NSNull null]]) {
@@ -139,8 +145,13 @@
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
+    //height of the uitabelviewcell
         return 100;
 }
 
-
+//dealloc method
+-(void)dealloc{
+    [super dealloc];
+    [self.activityIndicator release];
+}
 @end

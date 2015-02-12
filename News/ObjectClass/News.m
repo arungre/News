@@ -12,7 +12,7 @@
 @synthesize title;
 @synthesize descripn;
 @synthesize imagRef;
-
+//Extracting dictionary
 - (id)initWithJSONDictionary:(NSDictionary *)jsonDictionary {
     if(self = [self init]) {
         self.title=nil;
@@ -40,12 +40,9 @@
     
     return [self autorelease];
 }
-
+//dealloc method
 -(void)dealloc{
     [super dealloc];
-    [self.title release];
-    [self.descripn release];
-    [self.imagRef release];
 }
 
 @end

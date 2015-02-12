@@ -21,9 +21,12 @@
 
 - (void)setDetailItem:(id)newDetailItem {
     if (_detailItem != newDetailItem) {
-        _detailItem = newDetailItem;
-            
+        _detailItem = newDetailItem;            
         // Update the view.
+        self.titleTxt = nil;
+        self.detailDescriptionLabel=nil;
+        self.imageView=nil;
+        
         [self configureView];
     }
 }
@@ -31,6 +34,7 @@
 - (void)configureView {
     // Update the user interface for the detail item.
     if (self.detailItem) {
+        
         News *detailNews=_detailItem;
         self.titleTxt.text=detailNews.title;
         if ([detailNews.descripn isEqual:[NSNull null]]) {
@@ -42,6 +46,7 @@
         self.imageView.image = [UIImage imageNamed:@"NoImg.png"];
         
         if (![detailNews.imagRef isEqual:[NSNull null]]) {
+            self.imageView.image = [UIImage imageNamed:@"NoImg.png"];
             NSURL *url = [NSURL URLWithString:detailNews.imagRef];
             dispatch_queue_t q = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0ul);
             dispatch_async(q, ^{
@@ -68,6 +73,7 @@
     
     }
 }
+#pragma ViewLifeCycle
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -78,6 +84,16 @@
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
+}
+
+-(void)viewDidUnload{
+    [super viewDidUnload];
+    self.titleTxt=nil;
+    self.detailDescriptionLabel=nil;
+    self.imageView =nil;
+}
+-(void)dealloc{
+    [super dealloc];
 }
 
 @end
