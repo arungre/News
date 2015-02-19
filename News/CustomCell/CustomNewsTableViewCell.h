@@ -9,8 +9,8 @@
 #import <UIKit/UIKit.h>
 
 @interface CustomNewsTableViewCell : UITableViewCell
-@property(nonatomic,retain)IBOutlet UILabel *titleLbl;
-@property(nonatomic,retain)IBOutlet UILabel *descriptionLbl;
-@property(nonatomic,retain)IBOutlet UIImageView *imageViewref;
+@property(nonatomic,retain) UILabel *titleLabel;
+@property(nonatomic,retain) UILabel *descriptionLabel;
+@property(nonatomic,retain) UIImageView *imageViewref;
 
 @end

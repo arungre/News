@@ -14,7 +14,8 @@
 @synthesize imagRef;
 //Extracting dictionary
 - (id)initWithJSONDictionary:(NSDictionary *)jsonDictionary {
-    if(self = [self init]) {
+    if(self = [self init])
+    {
         self.title=nil;
         self.descripn=nil;
         self.imagRef=nil;
@@ -41,7 +42,8 @@
     return [self autorelease];
 }
 //dealloc method
--(void)dealloc{
+-(void)dealloc
+{
     [super dealloc];
 }
 
